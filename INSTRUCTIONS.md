@@ -16,7 +16,7 @@ So let’s get started. The first thing to do is to build out the shell of our a
 
   1. Click the button below to fork the project into IBM DevOps Services and deploy your own instance of this application on [IBM Bluemix][bluemix].
 
-  [![Deploy to Bluemix](https://bluemix.net/deploy/button.png)](https://bluemix.net/deploy?repository=https://github.com/aldelucca1/image-analysis)
+  [![Deploy to Bluemix](https://bluemix.net/deploy/button.png)](https://bluemix.net/deploy?repository=https://github.com/watson-developer-cloud/image-analysis)
 
   2. From here you will be taken to a Bluemix page, where you will be prompted to name your app. A sample name is provided for you, but feel free to give your application any name you like (if the name is taken by another user you will be prompted to try another name).
 
@@ -34,18 +34,22 @@ So let’s get started. The first thing to do is to build out the shell of our a
   
 ## Add services to the application
 
-  1. So far, we have deployed our pre built starter application to Bluemix. We are going to show how easy it is to add additional Watson services to our applications using Bluemix.  On the Bluemix Dashboard, scroll down to find your Image Analysis application within the "Applications" section. From here, click on the application to open the application homepage.
+  1. So far, we have deployed our pre built starter application to Bluemix. We are going to show how easy it is to add additional Watson services to our applications using Bluemix.
+
+  On the Bluemix Dashboard, scroll down to find your Image Analysis application within the "Applications" section. From here, click on the application to open the application homepage.
   
   ![dashboard-app](instructions/dashboard-app.png)
   
-  2. Within the application homepage, we are able to see what services we have already included. You will notice that we already have Text to Speech and Visual Recognition built into the application. We are now going to add a third service into the application.To do this, click the "Add a Service or API" button on the homepage
+  2. Within the application homepage, we are able to see what services we have already included. You will notice that we already have Text to Speech and Visual Recognition built into the application. We are now going to add a third service into the application.
+To do this, click the "Add a Service or API" button on the homepage
 
   ![app-details](instructions/app-details.png)
   
   3. From the list of Watson services, select the Machine Translation service and add it to your application. For the purposes of this lab, all of the default settings of the service will work, so when presented with the Machine Translation details page, select the green "Create" button to proceed.
 
   ![add-service](instructions/add-service.png)
-    **Note:** you may be prompted to restage your application at this point. This is required in order to rebuild the application with the new Machine Translation service that we have added. Select "Restage" to proceed.
+  
+  **Note:** you may be prompted to restage your application at this point. This is required in order to rebuild the application with the new Machine Translation service that we have added. Select "Restage" to proceed.
   
 ## Test out the application
 
@@ -53,7 +57,8 @@ So let’s get started. The first thing to do is to build out the shell of our a
 
   ![app-route](instructions/app-route.png)
   
-  When launched, you will be able to see the simple image recognition application, that allows a user to select a photo and identify the captured image. When clicking on the speaker button button in the bottom right hand corner you will hear the identified description.Let’s test the application out. 
+  When launched, you will be able to see the simple image recognition application, that allows a user to select a photo and identify the captured image. When clicking on the speaker button button in the bottom right hand corner you will hear the identified description.
+Let’s test the application out. 
 
   2. Select the icon in the top right hand corner to prompt for image upload. On the desktop, we have provided some sample images in order to test out the application.
 
@@ -61,7 +66,9 @@ So let’s get started. The first thing to do is to build out the shell of our a
 
   3. When the image has been recognized, click on the Speaker icon to hear the description of the image spoken to you.
   
-We are going to demonstrate how easy it is to use the Watson services on Bluemix to add functionality to existing applications. Our current application can identify images and read out that identification using audio. However let’s say that we wanted to be able to identify these images for a wider user base, which requires translation into other languages.Luckily, we’ve already started the process to do this. To fully implement the ability to translate these descriptions in our application, we are going to edit our application code to add the Machine Translation service that we added earlier.
+We are going to demonstrate how easy it is to use the Watson services on Bluemix to add functionality to existing applications. Our current application can identify images and read out that identification using audio. However let’s say that we wanted to be able to identify these images for a wider user base, which requires translation into other languages.
+
+Luckily, we’ve already started the process to do this. To fully implement the ability to translate these descriptions in our application, we are going to edit our application code to add the Machine Translation service that we added earlier.
   
 ## Modify the existing application
 
@@ -69,18 +76,44 @@ We are going to demonstrate how easy it is to use the Watson services on Bluemix
   Click on **Edit Code.**
 
   2. Clicking on Edit Code will take you to the Jazz Hub repository, which will allow us to edit and push new versions of our code to the application.
-    Within the Github repository, navigate to routes folder and select **File -> New -> File** and name the new file `mt.js`
+  
+  Within the Github repository, navigate to routes folder and select **File -> New -> File** and name the new file `mt.js`
 
   3. Open up `mt.js` and copy the code below:  
 
   ```js
-  "use strict";	
-  var fs = require("fs"),      extend = require("util")._extend,      watson = require("watson-developer-cloud"),      bluemix = require("../config/bluemix");  module.exports = function() {
-         var machineTranslation = watson.machine_translation(extend({          version: "v1",          username: "<<service_username>>",          password: "<<service_password>>",       }, bluemix.getServiceCreds("machine_translation")));     
-       return {          translate: function(req, res) {               var params = {                    text: req.body.text,                    to: req.body.to || "eses",                    from: "enus"
-               };               machineTranslation.translate(params, function(error, result) {                   if (error) {                       return res.status(error.error ? error.error.code || 500 : 500).json({ error: error });                   } else {                       return res.json(result);                   }
-               });           } 
-       }  }();
+  "use strict";
+	
+  var fs = require("fs"),
+      extend = require("util")._extend,
+      watson = require("watson-developer-cloud"),
+      bluemix = require("../config/bluemix");
+
+  module.exports = function() {
+  
+       var machineTranslation = watson.machine_translation(extend({
+          version: "v1",
+          username: "<<service_username>>",
+          password: "<<service_password>>",
+       }, bluemix.getServiceCreds("machine_translation")));
+     
+       return {
+          translate: function(req, res) {
+               var params = {
+                    text: req.body.text,
+                    to: req.body.to || "eses",
+                    from: "enus"
+               };
+               machineTranslation.translate(params, function(error, result) {
+                   if (error) {
+                       return res.status(error.error ? error.error.code || 500 : 500).json({ error: error });
+                   } else {
+                       return res.json(result);
+                   }
+               });
+           } 
+       }
+  }();
   ```
 
   The code above will connect the app to the [Machine Translation][mt_service] service.
@@ -123,7 +156,8 @@ We are going to demonstrate how easy it is to use the Watson services on Bluemix
 
 ## Test
 
-To test out our application, navigate back to your application homepage on Bluemix. Select the URL next to "Route" in the same way that we launched our previously unfinished application before.The new application will perform the same functions are our previous version, but this time you will see translation for the images as well.
+To test out our application, navigate back to your application homepage on Bluemix. Select the URL next to "Route" in the same way that we launched our previously unfinished application before.
+The new application will perform the same functions are our previous version, but this time you will see translation for the images as well.
 
 # Congratulations 
 You have completed the Image Analysis Lab! :bowtie:
