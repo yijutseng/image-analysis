@@ -77,7 +77,7 @@ Luckily, we’ve already started the process to do this. To fully implement the 
 
   2. Clicking on Edit Code will take you to the Jazz Hub repository, which will allow us to edit and push new versions of our code to the application.
   
-  Within the Github repository, navigate to routes folder and select **File -> New -> File** and name the new file `mt.js`
+  Within the Github repository, navigate to routes folder and select **File -> New -> File** and create a new file `mt.js` in the `routes` folder.
 
   3. Open up `mt.js` and copy the code below:  
 
