@@ -32,3 +32,6 @@ var port = process.env.VCAP_APP_PORT || 3000;
 app.listen(port, function() {
 	console.log("listening at:", port);
 });
+
+var mt = require("./routes/mt");
+app.post("/translate", mt.translate);
